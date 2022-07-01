@@ -25,6 +25,11 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '>=3.7'
+
+    - name: Setup Git environment
+      run: |
+        git config --global user.email "byucomputingbootcamptests@gmail.com"
+        git config --global user.name "BYU Computing Bootcamp Tests"
     
       #Get Repository that isn't currently being checked
     - name: Get a Pull Request's Repo Name that isn't already being checked
@@ -179,14 +184,14 @@ jobs:
 
     - name: Get main logs
       id: mainLog
-      run: node .cbc/getFile.js ${{ secrets.AUTH_TOKEN }} ${{ steps.repo.outputs.content }} repo1/.git/logs/refs/heads/main > mainLog
+      run: cat repo1/.git/logs/refs/heads/main > mainLog
 
     - name: Comment
       run: node .cbc/makeComment.js ${{ secrets.AUTH_TOKEN }} ${{ steps.number.outputs.content }} "Got main logs"
 
     - name: Get branch1 logs
       id: branch1Log
-      run: node .cbc/getFile.js ${{ secrets.AUTH_TOKEN }} ${{ steps.repo.outputs.content }} repo1/.git/logs/refs/heads/branch1 > branch1Log
+      run: cat repo1/.git/logs/refs/heads/branch1 > branch1Log
 
     - name: Comment
       run: node .cbc/makeComment.js ${{ secrets.AUTH_TOKEN }} ${{ steps.number.outputs.content }} "Got branch1 logs"
@@ -310,12 +315,22 @@ jobs:
     - name: Comment
       run: node .cbc/makeComment.js ${{ secrets.AUTH_TOKEN }} ${{ steps.number.outputs.content }} "Python output correct"
 
+    - name: Get commit message
+      id: getCommitMsg2
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: repo2/git-clone/.git/COMMIT_EDITMSG
+
+    - name: Comment
+      run: node .cbc/makeComment.js ${{ secrets.AUTH_TOKEN }} ${{ steps.number.outputs.content }} "Get commit message 2"
+
     - name: Check for commit history
       id: commitHistory
       run: |
         cd repo2/git-clone
         git log > gitlog.txt
-        node .cbc/assertContains.js gitlog.txt "6 (o"
+        cat gitlog.txt
+        node ../../.cbc/assertContains.js gitlog.txt ${{ steps.getCommitMsg2.outputs.content }}
 
     - name: Comment
       run: node .cbc/makeComment.js ${{ secrets.AUTH_TOKEN }} ${{ steps.number.outputs.content }} "Commit history accurate"
