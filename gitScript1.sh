@@ -7,4 +7,4 @@ git checkout branch1
 git add git_check.py
 git commit - m 'committed git_check.py to branch 1'
 git checkout main
-git merge branch 1
+git merge branch1
